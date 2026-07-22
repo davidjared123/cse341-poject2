@@ -1,6 +1,9 @@
 const express = require('express');
 const dotenv = require('dotenv');
 const mongodb = require('./config/db');
+const session = require('express-session');
+const passport = require('passport');
+const GitHubStrategy = require('passport-github2').Strategy;
 
 dotenv.config();
 
@@ -11,6 +14,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Express Session Middleware
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || 'super_secret_session_key',
+    resave: false,
+    saveUninitialized: true
+  })
+);
+
+// Initialize Passport and Session Support
+app.use(passport.initialize());
+app.use(passport.session());
+
 // CORS headers
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -20,6 +36,29 @@ app.use((req, res, next) => {
   );
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   next();
+});
+
+// Passport GitHub Strategy Configuration
+passport.use(
+  new GitHubStrategy(
+    {
+      clientID: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+      callbackURL: process.env.GITHUB_CALLBACK_URL
+    },
+    (accessToken, refreshToken, profile, done) => {
+      // Return user profile to passport
+      return done(null, profile);
+    }
+  )
+);
+
+passport.serializeUser((user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+  done(null, user);
 });
 
 // Routes

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const productsController = require('../controllers/products');
+const { isAuthenticated } = require('../middleware/authenticate');
 const {
   productValidationRules,
   validateId,
@@ -8,18 +9,18 @@ const {
 } = require('../middleware/validate');
 
 // GET all products
-router.get('/', productsController.getAllProducts);
+router.get('/', isAuthenticated, productsController.getAllProducts);
 
 // GET single product by ID
-router.get('/:id', validateId(), handleValidationErrors, productsController.getProductById);
+router.get('/:id', isAuthenticated, validateId(), handleValidationErrors, productsController.getProductById);
 
 // POST create product
-router.post('/', productValidationRules(), handleValidationErrors, productsController.createProduct);
+router.post('/', isAuthenticated, productValidationRules(), handleValidationErrors, productsController.createProduct);
 
 // PUT update product by ID
-router.put('/:id', validateId(), productValidationRules(), handleValidationErrors, productsController.updateProduct);
+router.put('/:id', isAuthenticated, validateId(), productValidationRules(), handleValidationErrors, productsController.updateProduct);
 
 // DELETE product by ID
-router.delete('/:id', validateId(), handleValidationErrors, productsController.deleteProduct);
+router.delete('/:id', isAuthenticated, validateId(), handleValidationErrors, productsController.deleteProduct);
 
 module.exports = router;

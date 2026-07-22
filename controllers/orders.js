@@ -3,9 +3,6 @@ const { ObjectId } = require('mongodb');
 
 // GET all orders
 const getAllOrders = async (req, res, next) => {
-  /* #swagger.tags = ['Orders']
-     #swagger.summary = 'Get all orders'
-     #swagger.description = 'Retrieves a list of all orders from the database.' */
   try {
     const result = await mongodb.getDb().db().collection('orders').find().toArray();
     res.setHeader('Content-Type', 'application/json');
@@ -17,9 +14,6 @@ const getAllOrders = async (req, res, next) => {
 
 // GET single order by ID
 const getOrderById = async (req, res, next) => {
-  /* #swagger.tags = ['Orders']
-     #swagger.summary = 'Get order by ID'
-     #swagger.description = 'Retrieves a single order using its 24-character ObjectId.' */
   try {
     const orderId = new ObjectId(req.params.id);
     const result = await mongodb.getDb().db().collection('orders').findOne({ _id: orderId });
@@ -37,21 +31,7 @@ const getOrderById = async (req, res, next) => {
 
 // POST create order
 const createOrder = async (req, res, next) => {
-  /* #swagger.tags = ['Orders']
-     #swagger.summary = 'Create a new order'
-     #swagger.description = 'Creates a new order in the database.'
-     #swagger.parameters['body'] = {
-        in: 'body',
-        description: 'Order object',
-        required: true,
-        schema: {
-          customerName: 'John Doe',
-          productName: 'Wireless Noise-Canceling Headphones',
-          quantity: 2,
-          totalAmount: 399.98,
-          status: 'Pending'
-        }
-     } */
+
   try {
     const order = {
       customerName: req.body.customerName,
