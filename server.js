@@ -83,13 +83,17 @@ app.use((err, req, res, next) => {
 });
 
 // Initialize Database Connection and Start Server
-mongodb.initDb((err) => {
-  if (err) {
-    console.error('Failed to connect to MongoDB Atlas:', err);
-  } else {
-    app.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-      console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
-    });
-  }
-});
+if (require.main === module) {
+  mongodb.initDb((err) => {
+    if (err) {
+      console.error('Failed to connect to MongoDB Atlas:', err);
+    } else {
+      app.listen(port, () => {
+        console.log(`Server running on port ${port}`);
+        console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
+      });
+    }
+  });
+}
+
+module.exports = app;

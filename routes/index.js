@@ -23,9 +23,11 @@ if (swaggerDocument) {
   });
 }
 
-// Collection 1 & Collection 2 Routes
+// Collections Routes
 router.use('/products', require('./products'));
 router.use('/orders', require('./orders'));
+router.use('/users', require('./users'));
+router.use('/reviews', require('./reviews'));
 
 // Root endpoint
 router.get('/', (req, res) => {

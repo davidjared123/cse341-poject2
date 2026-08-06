@@ -59,6 +59,57 @@ const orderValidationRules = () => {
   ];
 };
 
+// Validation rules for Users (firstName, lastName, email, username, role)
+const userValidationRules = () => {
+  return [
+    body('firstName')
+      .trim()
+      .notEmpty()
+      .withMessage('First name is required and cannot be empty.'),
+    body('lastName')
+      .trim()
+      .notEmpty()
+      .withMessage('Last name is required and cannot be empty.'),
+    body('email')
+      .trim()
+      .isEmail()
+      .withMessage('Must be a valid email address.'),
+    body('username')
+      .trim()
+      .notEmpty()
+      .withMessage('Username is required and cannot be empty.'),
+    body('role')
+      .trim()
+      .isIn(['Admin', 'Customer', 'Guest'])
+      .withMessage('Role must be one of: Admin, Customer, Guest.')
+  ];
+};
+
+// Validation rules for Reviews (productId, reviewerName, rating, comment)
+const reviewValidationRules = () => {
+  return [
+    body('productId')
+      .trim()
+      .custom((value) => {
+        if (!ObjectId.isValid(value)) {
+          throw new Error('Product ID must be a valid 24-character hexadecimal ObjectId.');
+        }
+        return true;
+      }),
+    body('reviewerName')
+      .trim()
+      .notEmpty()
+      .withMessage('Reviewer name is required and cannot be empty.'),
+    body('rating')
+      .isInt({ min: 1, max: 5 })
+      .withMessage('Rating must be an integer between 1 and 5.'),
+    body('comment')
+      .trim()
+      .notEmpty()
+      .withMessage('Comment is required and cannot be empty.')
+  ];
+};
+
 // Mongo ObjectId param validation
 const validateId = () => {
   return [
@@ -90,6 +141,8 @@ const handleValidationErrors = (req, res, next) => {
 module.exports = {
   productValidationRules,
   orderValidationRules,
+  userValidationRules,
+  reviewValidationRules,
   validateId,
   handleValidationErrors
 };
