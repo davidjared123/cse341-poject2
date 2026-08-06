@@ -6,6 +6,10 @@ const swaggerUi = require('swagger-ui-express');
 let swaggerDocument;
 try {
   swaggerDocument = require('../swagger.json');
+  if (swaggerDocument && process.env.RENDER_EXTERNAL_URL) {
+    swaggerDocument.host = process.env.RENDER_EXTERNAL_URL.replace(/^https?:\/\//, '');
+    swaggerDocument.schemes = ['https'];
+  }
 } catch (e) {
   swaggerDocument = null;
 }
@@ -40,7 +44,7 @@ router.get('/login', (req, res, next) => {
   /* #swagger.tags = ['Authentication']
      #swagger.summary = 'Log in via GitHub OAuth'
      #swagger.description = 'Redirects the user to GitHub to authenticate. Requires setting up GitHub OAuth credentials.' */
-  passport.authenticate('github', { scope: ['user:email'] })(req, res, next);
+  passport.authenticate('github', { scope: ['user:email'], prompt: 'select_account' })(req, res, next);
 });
 
 router.get(

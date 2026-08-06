@@ -39,12 +39,14 @@ app.use((req, res, next) => {
 });
 
 // Passport GitHub Strategy Configuration
+const callbackURL = process.env.GITHUB_CALLBACK_URL || (process.env.RENDER_EXTERNAL_URL ? `${process.env.RENDER_EXTERNAL_URL}/github/callback` : 'http://localhost:8080/github/callback');
+
 passport.use(
   new GitHubStrategy(
     {
       clientID: process.env.GITHUB_CLIENT_ID,
       clientSecret: process.env.GITHUB_CLIENT_SECRET,
-      callbackURL: process.env.GITHUB_CALLBACK_URL
+      callbackURL: callbackURL
     },
     (accessToken, refreshToken, profile, done) => {
       // Return user profile to passport
@@ -67,7 +69,13 @@ app.use('/', require('./routes'));
 // Global Error Handling Middleware
 app.use((err, req, res, next) => {
   console.error('Unhandled Error:', err.stack || err);
-  res.status(err.status || 500).json({
+  let statusCode = err.status || 500;
+  
+  if (err.name === 'BSONError' || err.name === 'ValidationError' || err.message.includes('ObjectId')) {
+    statusCode = 400;
+  }
+
+  res.status(statusCode).json({
     success: false,
     message: err.message || 'Internal Server Error',
     error: process.env.NODE_ENV === 'development' ? err.stack : undefined
